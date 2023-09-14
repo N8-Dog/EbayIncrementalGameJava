@@ -23,6 +23,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 public class GUI implements ActionListener{
 	
@@ -68,7 +69,7 @@ public class GUI implements ActionListener{
             	initMenuBar();
             	
             	user = new Player("Jacques Petitgros");
-            	panel = new JPanel(new GridLayout(6, 6));
+            	panel = new JPanel(new GridLayout(6, 6, 100, 50));
                 initImages();
                 
             	int i = 0;
@@ -78,31 +79,31 @@ public class GUI implements ActionListener{
                     groupPanel.setLayout(new BorderLayout(20,10));
                     
                     JLabel name = new JLabel(obj.getName());
+                    
                     groupPanel.add(name, BorderLayout.NORTH);
+                    
                     JLabel price = new JLabel("Price : " + obj.getLePrice());
-                    groupPanel.add(objectStore[i++], BorderLayout.CENTER);
+                    groupPanel.add(objectStore[i++], BorderLayout.CENTER);//TODO objects don't have the right name
                     groupPanel.add(price, BorderLayout.EAST);
                     JLabel inc = new JLabel("Pay : " + obj.getLeInc());
                     groupPanel.add(inc, BorderLayout.WEST);
-                    JButton buy = new JButton("Buy");
+                    JButton buy = new JButton("Buy");//TODO buy button
                     groupPanel.add(buy, BorderLayout.SOUTH);
                     
                     panel.add(groupPanel);
-                    panel.add(Box.createVerticalStrut(10));
-                    
+                    //panel.add(Box.createVerticalStrut(1));
+                    //TODO fix objects layout
                     
             	}
             	
-            	mainFrame.setLayout(new GridLayout(2,1));
+            	mainFrame.setLayout(new GridLayout(3,1));//TODO add player info and interface
             	titlePanel.add(mainTitleLogo);
             	mainFrame.setLayout(new BorderLayout(20,10));
             	mainFrame.add(titlePanel, BorderLayout.NORTH);
             	mainFrame.add(panel, BorderLayout.CENTER);
-            	
-            	
-                System.out.println("panel Height : " + panel.getHeight());
-                System.out.println("panel Width : " + panel.getWidth());
             	mainFrame.pack();
+            	titlePanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 50));
+            	panel.setBorder(BorderFactory.createEmptyBorder(0,50,50,50));
             	mainFrame.setLocationRelativeTo(null);
             	mainFrame.setVisible(true);
             }
@@ -178,7 +179,7 @@ public class GUI implements ActionListener{
 	
 	public void initMenuBar() {
 	    
-
+		//TODO make events for buttons
 		mb = new JMenuBar();
 	    menu = new JMenu("Menu");
 	    pause = new JMenu("Pause");
