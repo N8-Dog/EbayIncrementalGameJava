@@ -31,13 +31,20 @@ public class GUI implements ActionListener{
 	JLabel label;
 	JFrame frameIntro;
 	JFrame mainFrame;
+	
 	JPanel panel;
 	JPanel titlePanel;
 	JPanel toolBar;
+	
 	JButton buttonNewGame, buttonLoadGame, buttonSettings, buttonQuit;
+	
 	Player user;
+	
 	JLabel objectStore[];
 	JLabel mainTitleLogo;
+	JLabel username;
+	JLabel usercash;
+	JLabel userinc;
 	
     JMenuBar mb;
     JMenu menu, pause, about;
@@ -82,10 +89,10 @@ public class GUI implements ActionListener{
                     
                     groupPanel.add(name, BorderLayout.NORTH);
                     
-                    JLabel price = new JLabel("Price : " + obj.getLePrice());
+                    JLabel price = new JLabel("Price : " + obj.getLePrice() + "$");
                     groupPanel.add(objectStore[i++], BorderLayout.CENTER);//TODO objects don't have the right name
                     groupPanel.add(price, BorderLayout.EAST);
-                    JLabel inc = new JLabel("Pay : " + obj.getLeInc());
+                    JLabel inc = new JLabel("Pay : " + obj.getLeInc() + "$");
                     groupPanel.add(inc, BorderLayout.WEST);
                     JButton buy = new JButton("Buy");//TODO buy button
                     groupPanel.add(buy, BorderLayout.SOUTH);
@@ -101,9 +108,10 @@ public class GUI implements ActionListener{
             	mainFrame.setLayout(new BorderLayout(20,10));
             	mainFrame.add(titlePanel, BorderLayout.NORTH);
             	mainFrame.add(panel, BorderLayout.CENTER);
+            	mainFrame.add(initPlayerUI(), BorderLayout.SOUTH);
             	mainFrame.pack();
-            	titlePanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 50));
-            	panel.setBorder(BorderFactory.createEmptyBorder(0,50,50,50));
+            	//titlePanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 50));
+            	//panel.setBorder(BorderFactory.createEmptyBorder(0,50,50,50));
             	mainFrame.setLocationRelativeTo(null);
             	mainFrame.setVisible(true);
             }
@@ -121,7 +129,7 @@ public class GUI implements ActionListener{
 		panel.add(buttonLoadGame);
 		panel.add(buttonSettings);
 		panel.add(buttonQuit);
-
+		
 		
 		//button.addActionListener(this);
 		buttonQuit.addActionListener(this);
@@ -208,6 +216,23 @@ public class GUI implements ActionListener{
 	    
 	    
 	    
+	}
+	
+	public JPanel initPlayerUI(){
+		toolBar = new JPanel(new GridLayout(4, 1));
+		
+		username = new JLabel("Username : " + user.name);
+		//username.setHorizontalAlignment(JLabel.EAST);
+		usercash = new JLabel("Money : " + user.getLeMoney() + "$");
+		//usercash.setHorizontalAlignment(JLabel.EAST);
+		userinc = new JLabel("Income : " + user.getLeInc() + "$");
+		//userinc.setHorizontalAlignment(JLabel.EAST);
+		toolBar.add(Box.createVerticalStrut(1));
+		toolBar.add(username);
+		toolBar.add(usercash);
+		toolBar.add(userinc);
+		
+		return toolBar;
 	}
 	
 

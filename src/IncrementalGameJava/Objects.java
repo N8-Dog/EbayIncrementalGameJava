@@ -27,7 +27,19 @@ public class Objects {
 		}
 		
 		String getLePrice() {
-			return Integer.toString(price);
+			//return Integer.toString(price);
+			String lePrice = Integer.toString(price);
+			if(lePrice.length() < 4) return lePrice;
+			else {
+				String newPrice = "";
+				for (int i = 0; i < lePrice.length(); i++) {
+					if((lePrice.length() - i) % 3 == 0) {
+						newPrice += " ";
+					}
+					newPrice += lePrice.charAt(i);
+				}
+				return newPrice;
+			}
 		}
 		
 		int getInc() {
@@ -35,7 +47,18 @@ public class Objects {
 		}
 		
 		String getLeInc() {
-			return Integer.toString(inc);
+			String leInc = Integer.toString(inc);
+			if(leInc.length() < 4) return leInc;
+			else {
+				String newInc = "";
+				for (int i = 0; i < leInc.length(); i++) {
+					if((leInc.length() - i) % 3 == 0) {
+						newInc += " ";
+					}
+					newInc += leInc.charAt(i);
+				}
+				return newInc;
+			}
 		}
 		
 		String getInfo() {
