@@ -23,6 +23,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 public class GUI implements ActionListener{
@@ -36,7 +38,7 @@ public class GUI implements ActionListener{
 	JPanel titlePanel;
 	JPanel toolBar;
 	
-	JButton buttonNewGame, buttonLoadGame, buttonSettings, buttonQuit;
+	JButton buttonNewGame, buttonLoadGame, buttonSettings, buttonQuit, run;
 	
 	Player user;
 	
@@ -49,6 +51,12 @@ public class GUI implements ActionListener{
     JMenuBar mb;
     JMenu menu, pause, about;
     JMenuItem newGame, loadGame, settings, quit, pausePlay, info;
+    
+    int time = 1;
+    
+    
+    
+    boolean gameRunning;
 	
 	public GUI() {
 		frameIntro = new JFrame();
@@ -70,7 +78,7 @@ public class GUI implements ActionListener{
 		buttonNewGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	
+            	gameRunning = false;
             	panel.removeAll();
             	frameIntro.setVisible(false);
             	initMenuBar();
@@ -114,6 +122,8 @@ public class GUI implements ActionListener{
             	//panel.setBorder(BorderFactory.createEmptyBorder(0,50,50,50));
             	mainFrame.setLocationRelativeTo(null);
             	mainFrame.setVisible(true);
+            	
+            	
             }
         });
 		
@@ -138,7 +148,7 @@ public class GUI implements ActionListener{
 		frameIntro.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frameIntro.setTitle("EbayAdventures");
 		
-		frameIntro.setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\Madame_Crawford_V\\eclipse-workspace\\IncrementalGameJava\\src\\IncrementalGameJavaAssets/Icon.png"));
+		frameIntro.setIconImage(Toolkit.getDefaultToolkit().getImage("src\\IncrementalGameJavaAssets/Icon.png"));
 		
 	
 		frameIntro.pack();
@@ -155,12 +165,12 @@ public class GUI implements ActionListener{
 	
 	public void initImages() {
         try {
-            BufferedImage titleImage = ImageIO.read(new File("C:\\Users\\Madame_Crawford_V\\eclipse-workspace\\IncrementalGameJava\\src\\IncrementalGameJava\\Assets\\mainTitleLogo.png"));
+            BufferedImage titleImage = ImageIO.read(new File("src\\IncrementalGameJava\\Assets\\mainTitleLogo.png"));
             
             mainTitleLogo = new JLabel(new ImageIcon(titleImage));
             System.out.println("Height : " + titleImage.getHeight());
             System.out.println("Width : " + titleImage.getWidth());
-            BufferedImage originalImage = ImageIO.read(new File("C:\\Users\\Madame_Crawford_V\\eclipse-workspace\\IncrementalGameJava\\src\\IncrementalGameJava\\Assets\\objects.png")); // Replace with your image file path
+            BufferedImage originalImage = ImageIO.read(new File("src\\IncrementalGameJava\\Assets\\objects.png")); // Replace with your image file path
 
             int fragmentWidth = originalImage.getWidth() / 6; 
             int fragmentHeight = originalImage.getHeight() / 6; 
@@ -219,21 +229,64 @@ public class GUI implements ActionListener{
 	}
 	
 	public JPanel initPlayerUI(){
-		toolBar = new JPanel(new GridLayout(4, 1));
-		
+		toolBar = new JPanel(new GridLayout(3, 3));
 		username = new JLabel("Username : " + user.name);
 		//username.setHorizontalAlignment(JLabel.EAST);
 		usercash = new JLabel("Money : " + user.getLeMoney() + "$");
 		//usercash.setHorizontalAlignment(JLabel.EAST);
 		userinc = new JLabel("Income : " + user.getLeInc() + "$");
 		//userinc.setHorizontalAlignment(JLabel.EAST);
+		run = new JButton("RUN");
+		toolBar.add(username, BorderLayout.NORTH);
 		toolBar.add(Box.createVerticalStrut(1));
-		toolBar.add(username);
-		toolBar.add(usercash);
-		toolBar.add(userinc);
+		toolBar.add(run);
+		toolBar.add(usercash, BorderLayout.NORTH);
+		toolBar.add(Box.createVerticalStrut(1));
+		toolBar.add(Box.createVerticalStrut(1));
+		toolBar.add(userinc, BorderLayout.NORTH);
+		JProgressBar progressBar = new JProgressBar(0,100);
+		toolBar.add(progressBar, BorderLayout.WEST);
+		toolBar.add(Box.createVerticalStrut(1));
 		
+		run.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+		if(gameRunning) gameRunning = false;
+		else {
+			gameRunning = true;
+
+				user.tick();
+				update();
+			
+		}
+            }
+            });
 		return toolBar;
 	}
 	
+	public void run() {
+		while (gameRunning) {
+			performDelay();
+			user.tick();
+			update();
+		}
+	}
+	
+	private void performDelay() {
+		try { 
+			  synchronized (this) { 
+			   while (true) {//Or any Loops 
+			   //Do Something 
+			   this.wait(1000);//Sample obj.wait(1000); 1 second sleep 
+			   } 
+			  } 
+			 } catch (InterruptedException ex) { 
+			   mainFrame.dispose();
+			 } 
+    }
+	
+	private void update() {
+		usercash.setText(user.getLeMoney());
+	}
 
 }

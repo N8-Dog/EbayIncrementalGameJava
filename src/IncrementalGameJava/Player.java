@@ -17,7 +17,7 @@ public class Player {
 		this.objectIndex = new Objects[36];
 		try {
             // Create a FileReader to read the file
-            FileReader fileReader = new FileReader("C:\\Users\\Madame_Crawford_V\\eclipse-workspace\\IncrementalGameJava\\src\\IncrementalGameJava\\Assets\\names.objects");
+            FileReader fileReader = new FileReader("src\\IncrementalGameJava\\Assets\\names.objects");
             
             // Wrap the FileReader in a BufferedReader for efficient reading
             BufferedReader bufferedReader = new BufferedReader(fileReader);
