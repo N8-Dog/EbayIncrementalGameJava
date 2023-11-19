@@ -1,198 +1,265 @@
 package IncrementalGameJava;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.Color;
+
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
-import javax.imageio.ImageIO;
+
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.GroupLayout;
-import javax.swing.ImageIcon;
+
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import javax.swing.border.Border;
+
 
 public class GUI implements ActionListener{
 	
-	int counts = 0;
-	JLabel label;
-	JFrame frameIntro;
-	JFrame mainFrame;
+	imageManager manager;
 	
+	int counts = 0;
+	
+	JFrame mainFrame;
+	JPanel mainPanel;
 	JPanel panel;
 	JPanel titlePanel;
 	JPanel toolBar;
 	
-	JButton buttonNewGame, buttonLoadGame, buttonSettings, buttonQuit, run;
+	yourStorePanel yourStore;
+	playerToolBar playerTB;
+	JButton run;
 	
 	Player user;
-	
 	JLabel objectStore[];
+	JLabel label;
 	JLabel mainTitleLogo;
 	JLabel username;
 	JLabel usercash;
 	JLabel userinc;
+	JDialog welcome;
+	MainMenu parent;
 	
-    JMenuBar mb;
-    JMenu menu, pause, about;
-    JMenuItem newGame, loadGame, settings, quit, pausePlay, info;
-    
+	boolean incOn;
+	boolean gameRunning;
+	
+	private JTextArea textArea;
+	
+	   JMenuBar mb;
+	    JMenu menu, pause, about;
+	    JMenuItem newGame, settings, quit, pausePlay, info, saveGame;
+
+	JButton buttonNewGame,  buttonSettings, buttonQuit;
+
+	BuyListener buyListener;   
     int time = 1;
     
+    public GUI(String userName, MainMenu parent) {
+    	manager = parent.manager;
+    	
+    	gameRunning = true;
+    	mainFrame = new JFrame();
+    	//mainFrame.setSize(1000,1000);
+    	
+    	panel = new JPanel();
+    	titlePanel = new JPanel();
+    	label = new JLabel();
+    	incOn = false;
+    	this.objectStore = new JLabel[36];
+    	this.parent = parent;
+    	panel.removeAll();
+    	
+    	initMenuBar();
+    	
+    	user = new Player(userName, this);
+    	panel = new JPanel(new GridLayout(6,7,10,10));
+    	
+    	for (Objects obj : user.objectIndex) {
+    		
+    		JPanel groupPanel = new JPanel();
+    		Dimension dim = groupPanel.getPreferredSize();
+    		dim.height = 150;
+    		dim.width = 250;
+    		groupPanel.setPreferredSize(dim);
+    		
+    		Color color;
+
+    		switch(obj.getRarity()) {
+    		case vintage:
+    			color = new Color(255,200,51);
+    			break;
+    		case rare:
+    			color = new Color(51,129,255);
+    			break;
+    		case unique:
+    			color = new Color(51,255,75);
+    			break;
+    		case legendary:
+    			color = new Color(51, 220,255);
+    			break;
+    		default:
+    			color = new Color(0,0,0);
+    			break;
+    		}
+    		
+    		
+    		Border coloredBorder = BorderFactory.createLineBorder(color,3);
+    		
+    		Border innerBorder = BorderFactory.createTitledBorder(coloredBorder, obj.getName());
+    		
+    		Border outerBorder = BorderFactory.createEmptyBorder(5,5,5,5);
+    		groupPanel.setBorder(BorderFactory.createCompoundBorder(outerBorder, innerBorder));
+    		groupPanel.setLayout(new GridBagLayout());
+    		GridBagConstraints gc = new GridBagConstraints();
+    		
+    		//////// 1
+    		gc.gridx = 0;
+    		gc.gridy = 0;
+    		gc.gridheight = 4;
+    		JLabel image = manager.getLabel(obj.name);
+    		image.setToolTipText(obj.getStats());
+    		groupPanel.add(image, gc);
+    		
+    		//////// 2
+    		gc.gridx = 1;
+    		gc.gridy = 1;
+    		gc.gridheight = 1;
+    		JLabel price = new JLabel("Price : " + obj.getLePrice() + "$");
+    		groupPanel.add(price,gc);
+    		
+    		//////// 3
+    		gc.gridx = 1;
+    		gc.gridy++;
+    		JLabel condTag = new JLabel("Condition : ");
+    		groupPanel.add(condTag, gc);
+    		
+    		//////// 4
+    		gc.gridy++;
+    		JLabel cond = new JLabel(obj.getLeCondition());
+    		groupPanel.add(cond,gc);
+    		
+    		//////// 5 
+    		gc.gridy++;
+    		JLabel inc = new JLabel("Pay : " + obj.getLeInc() + "$");
+    		groupPanel.add(inc,gc);
+    		
+    		//////// 6 
+    		gc.gridy++;
+    		JButton buy = new JButton("Buy");
+    		buy.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String name = obj.getName();
+					int price = obj.getPrice();
+					int increment = obj.getInc();
+					int index = obj.getId();
+					
+					@SuppressWarnings("unused")
+					BuyEvent ev = new BuyEvent(this, name, increment, price, index);
+					
+					addEntry(user.buyObject(index));
+					yourStore.updateStorePanel();
+					
+					
+				}
+    			
+    		});
+    		
+    		groupPanel.add(buy, gc);
+    		panel.add(groupPanel);
+    	}
+    	
+    	user.setBuyListener(buyListener);
+    	mainPanel = new JPanel();
+    	mainPanel.setLayout(new GridBagLayout());
+    	GridBagConstraints gc = new GridBagConstraints();
+    	
+    	//////// top logo
+    	gc.fill = GridBagConstraints.HORIZONTAL;
+    	gc.gridy = 0;
+    	gc.gridx = 0;
+    	
+    	titlePanel.add(manager.getLabel("mainTitleLogo"));
+    	mainPanel.add(titlePanel, gc);
+    	
+    	//////// welcome dialog	
+    	
+    	JFrame dialogFrame = new JFrame();
+
+    	
+    	dialogFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    	dialogFrame.setSize(400, 300);
+    	
+    	JOptionPane.showMessageDialog(dialogFrame, "Welcome to Ebay Adventures, press RUN to begin earning", "Welcome", JOptionPane.INFORMATION_MESSAGE);
+    	dialogFrame.setLocationRelativeTo(mainFrame);
+    	
+    	//////// store section
+    	gc.gridy++;
+    	gc.gridheight = 10;
+    	JScrollPane scrollPane = new JScrollPane(panel);
+    	scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    	scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+    	scrollPane.setMinimumSize(new Dimension(400,600));
+    	gc.gridy++;
+    	gc.gridheight = 1;
+    	mainPanel.add(scrollPane,gc);
+    	
+    	//////// player ui
+    	gc.gridy++;
+    	playerTB = new playerToolBar();
+    	toolBar = playerTB.getPanel();
+    	mainPanel.add(toolBar,gc);
+    	
+    	//////// console section
+    	gc.gridy++;
+    	textArea = new JTextArea();
+    	textArea.setEnabled(false);
+    	textArea.setText("Welcome to the incredible world of Ebay Adventures ! \n");
+    	JScrollPane textPane = new JScrollPane(textArea);
+    	textPane.setMinimumSize(new Dimension(400,100));
+    	mainPanel.add(textPane, gc);
+    	
+    	//////// your store
+    	
+    	this.yourStore = new yourStorePanel(user, manager, this);
+    	gc.gridy=2;
+    	gc.gridx=2;
+    	mainPanel.add(yourStore,gc);
+    	mainFrame.add(mainPanel);
+    	//mainFrame.pack();
+    	mainFrame.setSize(1600,1000);
+    	mainFrame.setVisible(true);
+    	label.setHorizontalAlignment(JLabel.CENTER);
+    	panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+    	
+
+    }
     
-    
-    boolean gameRunning;
+    public void actionPerformed(ActionEvent e) {
+    	
+    }
 	
-	public GUI() {
-		frameIntro = new JFrame();
-		mainFrame = new JFrame();
-		panel = new JPanel();
-		titlePanel = new JPanel();
-		buttonNewGame = new JButton("New Game");
-		buttonLoadGame = new JButton("Load Game");
-		buttonSettings = new JButton("Settings");
-		buttonQuit = new JButton("Quit");
-		this.objectStore = new JLabel[36];
-		buttonQuit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	frameIntro.dispose();
-            }
-        });
-		
-		buttonNewGame.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	gameRunning = false;
-            	panel.removeAll();
-            	frameIntro.setVisible(false);
-            	initMenuBar();
-            	
-            	user = new Player("Jacques Petitgros");
-            	panel = new JPanel(new GridLayout(6, 6, 100, 50));
-                initImages();
-                
-            	int i = 0;
-            	for (Objects obj : user.objectIndex) {
-            		
-                    JPanel groupPanel = new JPanel();
-                    groupPanel.setLayout(new BorderLayout(20,10));
-                    
-                    JLabel name = new JLabel(obj.getName());
-                    
-                    groupPanel.add(name, BorderLayout.NORTH);
-                    
-                    JLabel price = new JLabel("Price : " + obj.getLePrice() + "$");
-                    groupPanel.add(objectStore[i++], BorderLayout.CENTER);//TODO objects don't have the right name
-                    groupPanel.add(price, BorderLayout.EAST);
-                    JLabel inc = new JLabel("Pay : " + obj.getLeInc() + "$");
-                    groupPanel.add(inc, BorderLayout.WEST);
-                    JButton buy = new JButton("Buy");//TODO buy button
-                    groupPanel.add(buy, BorderLayout.SOUTH);
-                    
-                    panel.add(groupPanel);
-                    //panel.add(Box.createVerticalStrut(1));
-                    //TODO fix objects layout
-                    
-            	}
-            	
-            	mainFrame.setLayout(new GridLayout(3,1));//TODO add player info and interface
-            	titlePanel.add(mainTitleLogo);
-            	mainFrame.setLayout(new BorderLayout(20,10));
-            	mainFrame.add(titlePanel, BorderLayout.NORTH);
-            	mainFrame.add(panel, BorderLayout.CENTER);
-            	mainFrame.add(initPlayerUI(), BorderLayout.SOUTH);
-            	mainFrame.pack();
-            	//titlePanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 50));
-            	//panel.setBorder(BorderFactory.createEmptyBorder(0,50,50,50));
-            	mainFrame.setLocationRelativeTo(null);
-            	mainFrame.setVisible(true);
-            	
-            	
-            }
-        });
-		
-	
-		
-		
-		label = new JLabel("Ebay Adventures");
-		label.setHorizontalAlignment(JLabel.CENTER);
-		panel.setBorder(BorderFactory.createEmptyBorder(100,100,100,100));
-		panel.setLayout(new GridLayout(0,1));
-		
-		panel.add(buttonNewGame);
-		panel.add(buttonLoadGame);
-		panel.add(buttonSettings);
-		panel.add(buttonQuit);
-		
-		
-		//button.addActionListener(this);
-		buttonQuit.addActionListener(this);
-		frameIntro.add(label, BorderLayout.NORTH);
-		frameIntro.add(panel, BorderLayout.CENTER);
-		frameIntro.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameIntro.setTitle("EbayAdventures");
-		
-		frameIntro.setIconImage(Toolkit.getDefaultToolkit().getImage("src\\IncrementalGameJavaAssets/Icon.png"));
-		
-	
-		frameIntro.pack();
-		frameIntro.setVisible(true);
-	}
-	public static void main(String[] args) {
-		new GUI();
-	}
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public void initImages() {
-        try {
-            BufferedImage titleImage = ImageIO.read(new File("src\\IncrementalGameJava\\Assets\\mainTitleLogo.png"));
-            
-            mainTitleLogo = new JLabel(new ImageIcon(titleImage));
-            System.out.println("Height : " + titleImage.getHeight());
-            System.out.println("Width : " + titleImage.getWidth());
-            BufferedImage originalImage = ImageIO.read(new File("src\\IncrementalGameJava\\Assets\\objects.png")); // Replace with your image file path
-
-            int fragmentWidth = originalImage.getWidth() / 6; 
-            int fragmentHeight = originalImage.getHeight() / 6; 
-
-            JPanel panel = new JPanel(new GridLayout(6, 6));
-            int index = 0;
-            for (int i = 0; i < 6; i++) {
-                for (int j = 0; j < 6; j++) {
-                    int x = i * fragmentWidth;
-                    int y = j * fragmentHeight;
-                    BufferedImage fragment = originalImage.getSubimage(x, y, fragmentWidth, fragmentHeight);
-                    ImageIcon icon = new ImageIcon(fragment);
-                    JLabel label = new JLabel(icon);
-                    objectStore[index++] = label;
-                }
-            }
-
-            mainFrame.getContentPane().add(panel);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+	private void openSaveMenu() {
+		SaveMenu popup = new SaveMenu(manager, this);
 	}
 	
 	public void initMenuBar() {
@@ -204,14 +271,37 @@ public class GUI implements ActionListener{
 	    about = new JMenu("About");
 	    
 	    newGame = new JMenuItem("New Game");
-	    loadGame = new JMenuItem("Load Game");
+	    saveGame = new JMenuItem("Save Game");
+	    saveGame.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openSaveMenu();
+				
+			}
+	    	
+	    });
 	    settings = new JMenuItem("Settings");
 	    quit = new JMenuItem("Quit");
+	    quit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				int confirm = JOptionPane.showConfirmDialog(null, "All unsaved progress will be lost, do you wish to abandon this beautiful realm of unseen magic ?", "Quit", JOptionPane.YES_NO_OPTION);
+				if(confirm == JOptionPane.YES_OPTION) {
+					mainFrame.setVisible(false);
+					parent.frameIntro.setVisible(true);
+				}
+
+			}
+	    	
+	    });
 	    pausePlay = new JMenuItem("Pause");
 	    info = new JMenuItem("About");
 	    
 	    menu.add(newGame);
-	    menu.add(loadGame);
+	   menu.add(saveGame);
 	    menu.add(settings);
 	    menu.add(quit);
 	    pause.add(pausePlay);
@@ -223,70 +313,108 @@ public class GUI implements ActionListener{
 	    
 	    mainFrame.setJMenuBar(mb);
 	    
-	    
-	    
-	    
 	}
 	
-	public JPanel initPlayerUI(){
-		toolBar = new JPanel(new GridLayout(3, 3));
-		username = new JLabel("Username : " + user.name);
-		//username.setHorizontalAlignment(JLabel.EAST);
-		usercash = new JLabel("Money : " + user.getLeMoney() + "$");
-		//usercash.setHorizontalAlignment(JLabel.EAST);
-		userinc = new JLabel("Income : " + user.getLeInc() + "$");
-		//userinc.setHorizontalAlignment(JLabel.EAST);
-		run = new JButton("RUN");
-		toolBar.add(username, BorderLayout.NORTH);
-		toolBar.add(Box.createVerticalStrut(1));
-		toolBar.add(run);
-		toolBar.add(usercash, BorderLayout.NORTH);
-		toolBar.add(Box.createVerticalStrut(1));
-		toolBar.add(Box.createVerticalStrut(1));
-		toolBar.add(userinc, BorderLayout.NORTH);
-		JProgressBar progressBar = new JProgressBar(0,100);
-		toolBar.add(progressBar, BorderLayout.WEST);
-		toolBar.add(Box.createVerticalStrut(1));
-		
-		run.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-		if(gameRunning) gameRunning = false;
-		else {
-			gameRunning = true;
-
-				user.tick();
-				update();
-			
+	private void run() {
+		if(incOn) {
+			incOn = false;
+			run.setText("RUN");
 		}
-            }
-            });
+		else {
+			incOn = true;
+			
+			run.setText("STOP");
+			startLoop();
+		}
+	}
+	
+	private void update() {
+		usercash.setText("Money : " + user.getLeMoney() + "$");
+		userinc.setText("Income : " + user.getLeInc() + "$/sec.");
+	}
+	
+	private void incrementer() {
+		user.tick();
+		update();
+	}
+	
+	public void startLoop() {
+		new Thread(() ->{
+			int clock = 0;
+			int i = 0;
+			while (incOn) {
+				if(i == 9) {
+					incrementer();
+					i = 0;
+					if(clock > 99) {
+						clock = 0;
+						user.gainValue();
+						yourStore.updateStorePanel();
+					}
+					clock++;
+				}
+				playerTB.tick(i);
+				i = i +1;
+				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		}).start();
+	}
+	
+	public void addEntry(String line) {
+		String oldLine = textArea.getText();
+		textArea.setText(oldLine + line + "\n");
+	}
+	
+	private class playerToolBar{
+
+
+		private JLabel username;
+		private JProgressBar progressBar;
+
+		public playerToolBar(){
+			toolBar = new JPanel(new GridLayout(3, 3));
+			username = new JLabel("Username : " + user.name);
+			//username.setHorizontalAlignment(JLabel.EAST);
+			usercash = new JLabel("Money : " + user.getLeMoney() + "$");
+			//usercash.setHorizontalAlignment(JLabel.EAST);
+			userinc = new JLabel("Income : " + user.getLeInc() + "$");
+			//userinc.setHorizontalAlignment(JLabel.EAST);
+			run = new JButton("RUN");
+			toolBar.add(username, BorderLayout.NORTH);
+			toolBar.add(Box.createVerticalStrut(1));
+			toolBar.add(run);
+			toolBar.add(usercash, BorderLayout.NORTH);
+			toolBar.add(Box.createVerticalStrut(1));
+			toolBar.add(Box.createVerticalStrut(1));
+			toolBar.add(userinc, BorderLayout.NORTH);
+			progressBar = new JProgressBar(0,9);
+			progressBar.setValue(0);			
+			toolBar.add(progressBar, BorderLayout.WEST);
+			toolBar.add(Box.createVerticalStrut(1));
+
+			run.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					run();
+				}
+			});
+
+		}
+		
+		public JPanel getPanel() {
 		return toolBar;
 	}
 	
-	public void run() {
-		while (gameRunning) {
-			performDelay();
-			user.tick();
-			update();
-		}
-	}
-	
-	private void performDelay() {
-		try { 
-			  synchronized (this) { 
-			   while (true) {//Or any Loops 
-			   //Do Something 
-			   this.wait(1000);//Sample obj.wait(1000); 1 second sleep 
-			   } 
-			  } 
-			 } catch (InterruptedException ex) { 
-			   mainFrame.dispose();
-			 } 
-    }
-	
-	private void update() {
-		usercash.setText(user.getLeMoney());
-	}
 
-}
+
+	public void tick(int i) {
+		progressBar.setValue(i);
+	}
+}}
