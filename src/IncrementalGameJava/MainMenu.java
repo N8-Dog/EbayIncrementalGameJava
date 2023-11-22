@@ -125,7 +125,7 @@ public class MainMenu implements ActionListener{
 	public static void main(String[] args) {
 	new MainMenu();
 }
-	private void newGame(String text) {
+	public void newGame(String text) {
 		laGame = new GUI(text, this);
 	}
 }

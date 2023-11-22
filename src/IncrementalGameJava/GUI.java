@@ -258,7 +258,7 @@ public class GUI implements ActionListener{
     	
     }
 	
-	private void openSaveMenu() {
+	public void openSaveMenu() {
 		SaveMenu popup = new SaveMenu(manager, this);
 	}
 	

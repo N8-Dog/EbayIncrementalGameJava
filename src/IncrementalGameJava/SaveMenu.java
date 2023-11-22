@@ -6,8 +6,10 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -104,16 +106,38 @@ public class SaveMenu extends JFrame implements  Serializable {
 	}
 	
 	private void performSave(String id) throws IOException {
-		File saveFile;
-		saveFile = new File(id + ".save");
-
-		
-		FileOutputStream fos = new FileOutputStream(saveFile);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
+		String saveFile;
+		saveFile = id + ".save";
 		saveState state = new saveState(parent.user);
-		System.out.println(state.getSaveString());
+		
+		/*FileOutputStream fos = new FileOutputStream(saveFile);
+		ObjectOutputStream oos = new ObjectOutputStream(fos);
+		
+		//System.out.println(state.getSaveString());
 		oos.writeObject(state);
-		oos.close();
+		oos.close();*/
+		
+		try {
+            // Specify the file path
+            String filePath = "src\\IncrementalGameJava\\Saves\\" + saveFile;
+
+            // Create a BufferedWriter to write to the file
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+
+            // Write the data to the file
+            writer.write(state.getSaveString());
+
+            // Close the writer
+            writer.close();
+
+            System.out.println("Data has been written to the file successfully.");
+            
+        } catch (IOException e) {
+            System.out.println("An error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+		
+		updateSaveMenu();
 	}
 	
 	
@@ -229,7 +253,9 @@ public class SaveMenu extends JFrame implements  Serializable {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-						updateSaveMenu();
+						System.out.println("tout est bin beau");
+						
+						//updateSaveMenu();
 					}
 					
 				});

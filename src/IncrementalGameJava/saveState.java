@@ -78,35 +78,49 @@ public class saveState  implements  Serializable {
 	private ArrayList<String> getObjectArray(Objects[] objectArray) {
 		ArrayList<String> objArray = new ArrayList<String>();
 		for(Objects obj : objectArray) {
+			if(obj == null) {
+				for (int i = 0; i < 5; i++) {
+					objArray.add("empty");
+				}
+				objArray.add("&");
+				//return objArray;
+			}
+			else {
 			objArray.add(Integer.toString(obj.getId()));
 			objArray.add(Integer.toString(obj.getPrice()));
 			objArray.add(Integer.toString(obj.getInc()));
 			objArray.add(obj.getName());
-			objArray.add(obj.getPath());
+			//objArray.add(obj.getPath());
+			objArray.add(obj.getLeCondition());
+			objArray.add(obj.getLeRarity());
+			objArray.add("&");
+			}
 		}
 		return objArray;
 	}
 	
+	
+	
 	public String getSaveString() {
 		String saveString = "";
 		for(String content: getArray()) {
-			System.out.println(content);
+			//System.out.println(content);
 			saveString += content + ",";
 		}
 
 		saveString += "$";
 		for(String content: getMyStoreArray()){
-			System.out.println(content);
+			//System.out.println(content);
 			saveString += content + ",";
 		}
 		saveString += "$";
 		for(String content: getStoreArray()){
-			System.out.println(content);
+			//System.out.println(content);
 			saveString += content + ",";
 		}
 		saveString += "$";
-		System.out.println("-------------------------------------------");
-		System.out.println(saveString);
+		//System.out.println("-------------------------------------------");
+		//System.out.println(saveString);
 		return saveString;
 	}
 
