@@ -7,7 +7,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -259,7 +259,21 @@ public class GUI implements ActionListener{
     	mainPanel.add(yourStore,gc);
     	mainFrame.add(mainPanel);
     	//mainFrame.pack();
-    	mainFrame.setSize(1600,1000);
+    	
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+
+        // Get the screen size as a java.awt.Dimension
+        Dimension screenSize = toolkit.getScreenSize();
+
+        int screenWidth = screenSize.width;
+        int screenHeight = screenSize.height;
+        if(screenWidth > 1600 && screenHeight >1000) {
+        	mainFrame.setSize(1600,1000);
+
+        }
+        else {
+        	mainFrame.setSize(screenWidth,screenHeight);
+        }
     	mainFrame.setVisible(true);
     	label.setHorizontalAlignment(JLabel.CENTER);
     	panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
