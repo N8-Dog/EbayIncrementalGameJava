@@ -273,13 +273,15 @@ public class GUI implements ActionListener{
         }
         else {
         	mainFrame.setSize(screenWidth,screenHeight);
+        	int storeSectionWidth = screenWidth - yourStore.getWidth();
+        	int storeSectionHeight = screenHeight - (titlePanel.getHeight() + toolBar.getHeight() + textPane.getHeight());
+        	scrollPane.setSize(storeSectionWidth, storeSectionHeight);
         }
     	mainFrame.setVisible(true);
     	label.setHorizontalAlignment(JLabel.CENTER);
     	panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     	
-
-    }
+    	    }
     
     public void actionPerformed(ActionEvent e) {
     	
