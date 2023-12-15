@@ -23,10 +23,19 @@ public class yourStorePanel extends JPanel{
 	private Player player;
 	private GUI gui;
 	
-	public yourStorePanel(Player player, imageManager manager, GUI gui) {
+	public yourStorePanel(Player player, imageManager manager, GUI gui, boolean newGame) {
 		this.manager = manager;
 		this.player = player;
-		this.content = new yourStoreItem[4];
+		if(newGame)	{
+			this.content = new yourStoreItem[4];
+			addItem(player.myStore[0]);
+		}
+		else {
+			this.content = new yourStoreItem[4];
+			for(Objects obj : player.myStore) {
+				updateContent();
+			}
+		}
 		
 		this.gui = gui;
 		Dimension dim = this.getPreferredSize();
@@ -37,7 +46,7 @@ public class yourStorePanel extends JPanel{
 		Border outerBorder = BorderFactory.createEmptyBorder(5,5,5,5);
 		setBorder(BorderFactory.createCompoundBorder(outerBorder, innerBorder));
 		updateStorePanel();
-		addItem(player.myStore[0]);
+		
 		
 	}
 	
@@ -55,12 +64,14 @@ public class yourStorePanel extends JPanel{
 		
 		if(index < 4) {
 			content[index] = new yourStoreItem(object,index,this);
-			this.remove(index);
+			//this.remove(index);
 			add(content[index], gc);
 		}
 		
 		else System.out.println("Check tes shit !");
 	}
+	
+
 	
 	public void updateContent() {
 		for(int i = 0; i < 4; i++) {

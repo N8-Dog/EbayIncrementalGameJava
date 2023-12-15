@@ -73,6 +73,19 @@ public class GUI implements ActionListener{
     int time = 1;
     
     public GUI(String userName, MainMenu parent) {
+    	user = new Player(userName, this);
+    	this.parent = parent;
+    	initGUI(user, true);
+    }
+    
+    public GUI(saveState save, MainMenu parent) {
+    	user = new Player(save);
+    	this.parent = parent;
+    	initGUI(user, false);
+
+    }
+    
+    private void initGUI(Player user, boolean newGame) {
     	manager = parent.manager;
     	
     	gameRunning = true;
@@ -84,12 +97,12 @@ public class GUI implements ActionListener{
     	label = new JLabel();
     	incOn = false;
     	this.objectStore = new JLabel[36];
-    	this.parent = parent;
+    	
     	panel.removeAll();
     	
     	initMenuBar();
     	
-    	user = new Player(userName, this);
+    	
     	panel = new JPanel(new GridLayout(6,7,10,10));
     	
     	for (Objects obj : user.objectIndex) {
@@ -240,7 +253,7 @@ public class GUI implements ActionListener{
     	
     	//////// your store
     	
-    	this.yourStore = new yourStorePanel(user, manager, this);
+    	this.yourStore = new yourStorePanel(user, manager, this, newGame);
     	gc.gridy=2;
     	gc.gridx=2;
     	mainPanel.add(yourStore,gc);

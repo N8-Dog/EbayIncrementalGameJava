@@ -13,11 +13,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,14 +31,24 @@ public class SaveMenu extends JFrame implements  Serializable {
 	private JPanel panel;
 	private JButton cancel;
 	private GUI parent;
+	private String[] savelist;
+	private ArrayList<saveStateLine> saveStateLineList;
+	private String[] ids = {"one",
+			"two",
+			"three",
+			"four"};
+	
 	public SaveMenu(imageManager manager, GUI parent) {
 		this.manager = manager;
-		panel = new JPanel();
+		this.panel = new JPanel();
 		this.parent = parent;
-		updateSaveMenu();
+		initSaveMenu();
+		
 
+		
+		
 		setSize(1000,600);
-		setVisible(true);
+		
 		
 	}
 	
@@ -46,7 +58,8 @@ public class SaveMenu extends JFrame implements  Serializable {
 		String folderPath = "src\\IncrementalGameJava\\Saves";
 		File directory = new File(folderPath);
 		File[] filesList = directory.listFiles();
-		//System.out.println(filesList);
+		
+		
 		fileList = new String[filesList.length];
 		int i = 0;
 		for (File file : filesList) {
@@ -55,14 +68,14 @@ public class SaveMenu extends JFrame implements  Serializable {
 		return fileList;
 	}
 	
-	private void updateSaveMenu() {
-		panel.removeAll();
-		String[] saves = listFiles();
-		String[] ids = {"one",
-				"two",
-				"three",
-				"four"};
-		int count = saves.length;
+	private void initSaveMenu() {
+		
+		
+		
+		savelist = listFiles();
+
+		//saveStateLineList = saveStateLine[4];
+		int count = savelist.length;
 		
 		panel.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -81,7 +94,10 @@ public class SaveMenu extends JFrame implements  Serializable {
 		gc.gridy++;
 		for(int i = 0; i < 4; i++) {
 			if(count > 0) {
-			panel.add(new saveStateLine(new saveState("src\\IncrementalGameJava\\Saves\\" + saves[i]), ids[i]), gc);
+				System.out.println(savelist[i]);
+				panel.add(new saveStateLine(new saveState(savelist[i]), ids[i],i), gc);
+			
+			//newLine(i);
 			gc.gridy++;
 			count--;
 			}
@@ -103,7 +119,24 @@ public class SaveMenu extends JFrame implements  Serializable {
 		});
 		panel.add(cancel, gc);
 		add(panel);
+		setVisible(true);
 	}
+	
+	private void clearPanel() {
+		panel.removeAll();
+		//saveStateLineList.removeAll(saveStateLineList);
+		
+	}
+	
+	/*private void newLine(int i) {
+		saveStateLine newline = new saveStateLine(new saveState("src\\IncrementalGameJava\\Saves\\" + savelist[i]), ids[i],i);
+		panel.add(newline);
+		saveStateLineList.add(newline);
+	}
+	
+	private void delLine(int i) {
+		saveStateLineList.remove(i);
+	}*/
 	
 	private void performSave(String id) throws IOException {
 		String saveFile;
@@ -137,9 +170,22 @@ public class SaveMenu extends JFrame implements  Serializable {
             e.printStackTrace();
         }
 		
-		updateSaveMenu();
+		this.panel.removeAll();
+		initSaveMenu();
+		panel.revalidate();
+		panel.repaint();
+		parent.addEntry("Game Saved");
 	}
 	
+	private void performDelete(int id) {
+		//JFileChooser fileChooser = new JFileChooser();
+		File fileToDelete = new File(savelist[id]);
+		fileToDelete.delete();
+		this.panel.removeAll();
+		initSaveMenu();
+		panel.revalidate();
+		panel.repaint();
+	}
 	
 	public class saveStateLine extends JPanel{
 		/**
@@ -156,7 +202,7 @@ public class SaveMenu extends JFrame implements  Serializable {
 		JLabel storeCount;
 		JButton btn;
 		JButton del;
-		public saveStateLine(saveState p_save, String id) {
+		public saveStateLine(saveState p_save, String id, int i) {
 			this.save = p_save;
 			icon = manager.getLabel(id);
 			name = new JLabel("Name : " + p_save.getName());
@@ -199,6 +245,15 @@ public class SaveMenu extends JFrame implements  Serializable {
 			////////6
 			gc.gridx++;
 			del = new JButton("Delete");
+			del.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					performDelete(i);
+					
+				}
+				
+			});
 			add(del,gc);
 
 		}

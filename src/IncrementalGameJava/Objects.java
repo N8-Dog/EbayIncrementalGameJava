@@ -37,6 +37,15 @@ public class Objects  implements  Serializable {
 			this.rarity = setRarity();
 			this.condition = setCondition();
 		}
+		public Objects(int price, int inc, String name, String path, int id, Rarity rarity, Condition condition) {
+			this.name = name;
+			this.price = price;
+			this.inc = inc;
+			this.path = path;
+			this.id = id;
+			this.rarity = rarity;
+			this.condition = condition;
+		}
 		
 		String getName() {
 			return name;

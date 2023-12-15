@@ -67,8 +67,14 @@ public class Player {
 		this.gui = gui;
 	}
 	
-	public void saveGame() {
-		
+	public Player(saveState load) {
+		this.name = load.getName();
+		this.money = load.getMoney();
+		this.inc = load.getInc();
+		this.objectIndex = load.getObjectIndex();
+		this.myStore = load.getMyStore();
+		this.ownStoreCount = load.getOwnStoreCount();
+		this.gui = null;
 	}
 		
 	

@@ -61,7 +61,7 @@ public class MainMenu implements ActionListener{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new LoadMenu(manager);
+				openLoadMenu();
 				
 			}
 			
@@ -127,5 +127,15 @@ public class MainMenu implements ActionListener{
 }
 	public void newGame(String text) {
 		laGame = new GUI(text, this);
+		//frameIntro.setVisible(false);
 	}
+	
+	public void loadGame(saveState save) {
+		laGame = new GUI(save, this);
+		//frameIntro.setVisible(false);
+	}
+	
+	private void openLoadMenu() {
+		new LoadMenu(manager, this);
+		}
 }
