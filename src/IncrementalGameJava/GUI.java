@@ -289,6 +289,7 @@ public class GUI implements ActionListener{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if(incOn)run();
 				openSaveMenu();
 				
 			}
