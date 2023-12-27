@@ -132,7 +132,9 @@ public class yourStorePanel extends JPanel{
 			////////1
     		gc.gridx = 0;
     		gc.gridy = 1;
-    		add(manager.getLabel(object.name), gc);
+    		JLabel image = manager.getLabel(object.name);
+    		image.setToolTipText(object.getStats());
+    		add(image, gc);
     		
     		////////2
     		gc.gridx = 1;

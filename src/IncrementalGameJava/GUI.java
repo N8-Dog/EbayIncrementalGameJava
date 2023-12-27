@@ -7,15 +7,18 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
-
-
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -206,12 +209,42 @@ public class GUI implements ActionListener{
     	mainPanel.setLayout(new GridBagLayout());
     	GridBagConstraints gc = new GridBagConstraints();
     	
+    	Toolkit toolkit = Toolkit.getDefaultToolkit();
+
+        // Get the screen size as a java.awt.Dimension
+        Dimension screenSize = toolkit.getScreenSize();
+
+        int screenWidth = screenSize.width;
+        int screenHeight = screenSize.height;
+        
     	//////// top logo
     	gc.fill = GridBagConstraints.HORIZONTAL;
     	gc.gridy = 0;
     	gc.gridx = 0;
+    	if(screenWidth <= 1600 && screenHeight <=1000) {
+    		// Load an image
+            BufferedImage originalImage = null;
+            try {
+                originalImage = ImageIO.read(new File("src\\IncrementalGameJava\\Assets\\mainTitleLogo.png")); // Replace with your image path
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Scale the image
+            int scaledWidth = screenWidth - 200; // Desired width
+            int scaledHeight = 97; // Desired height
+            Image scaledImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+
+            // Create a JLabel and set the scaled image as its icon
+            ImageIcon icon = new ImageIcon(scaledImage);
+            JLabel imageLabel = new JLabel(icon);
+            titlePanel.add(imageLabel);
+    	}
     	
-    	titlePanel.add(manager.getLabel("mainTitleLogo"));
+    	else {
+        	titlePanel.add(manager.getLabel("mainTitleLogo"));
+    	}
+
     	mainPanel.add(titlePanel, gc);
     	
     	//////// welcome dialog	
@@ -231,7 +264,7 @@ public class GUI implements ActionListener{
     	JScrollPane scrollPane = new JScrollPane(panel);
     	scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     	scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-    	scrollPane.setMinimumSize(new Dimension(400,600));
+    	 scrollPane.setMinimumSize(new Dimension(600, 400)); 
     	gc.gridy++;
     	gc.gridheight = 1;
     	mainPanel.add(scrollPane,gc);
@@ -257,25 +290,16 @@ public class GUI implements ActionListener{
     	gc.gridy=2;
     	gc.gridx=2;
     	mainPanel.add(yourStore,gc);
-    	mainFrame.add(mainPanel);
-    	//mainFrame.pack();
     	
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-
-        // Get the screen size as a java.awt.Dimension
-        Dimension screenSize = toolkit.getScreenSize();
-
-        int screenWidth = screenSize.width;
-        int screenHeight = screenSize.height;
+    	mainFrame.add(mainPanel);
+    	mainFrame.pack();
+    	System.out.println(yourStore.getWidth());
         if(screenWidth > 1600 && screenHeight >1000) {
         	mainFrame.setSize(1600,1000);
 
         }
         else {
         	mainFrame.setSize(screenWidth,screenHeight);
-        	int storeSectionWidth = screenWidth - yourStore.getWidth();
-        	int storeSectionHeight = screenHeight - (titlePanel.getHeight() + toolBar.getHeight() + textPane.getHeight());
-        	scrollPane.setSize(storeSectionWidth, storeSectionHeight);
         }
     	mainFrame.setVisible(true);
     	label.setHorizontalAlignment(JLabel.CENTER);
