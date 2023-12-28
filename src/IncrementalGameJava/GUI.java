@@ -289,6 +289,14 @@ public class GUI implements ActionListener{
     	this.yourStore = new yourStorePanel(user, manager, this, newGame);
     	gc.gridy=2;
     	gc.gridx=2;
+    	
+    	Border coloredBorder = BorderFactory.createLineBorder(new Color(0,0,0),3);
+		
+		Border innerBorder = BorderFactory.createTitledBorder(coloredBorder, "Your Store");
+		
+		Border outerBorder = BorderFactory.createEmptyBorder(5,5,5,5);
+		this.yourStore.setBorder(BorderFactory.createCompoundBorder(outerBorder, innerBorder));
+		
     	mainPanel.add(yourStore,gc);
     	
     	mainFrame.add(mainPanel);
