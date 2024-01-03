@@ -27,6 +27,7 @@ public class Objects  implements  Serializable {
 		String path;
 		Rarity rarity;
 		Condition condition;
+		int value;
 		
 		public Objects(int price, int inc, String name, String path, int id) {
 			this.name = name;
@@ -36,6 +37,7 @@ public class Objects  implements  Serializable {
 			this.id = id;
 			this.rarity = setRarity();
 			this.condition = setCondition();
+			this.value = price;
 		}
 		public Objects(int price, int inc, String name, String path, int id, Rarity rarity, Condition condition) {
 			this.name = name;
@@ -45,6 +47,7 @@ public class Objects  implements  Serializable {
 			this.id = id;
 			this.rarity = rarity;
 			this.condition = condition;
+			this.value = price;
 		}
 		
 		String getName() {
@@ -211,6 +214,12 @@ public class Objects  implements  Serializable {
 
 		public void setInc(int inc) {
 			this.inc = inc;
+		}
+		public int getValue() {
+			return value;
+		}
+		public void setValue(int value) {
+			this.value = value;
 		}
 		
 		

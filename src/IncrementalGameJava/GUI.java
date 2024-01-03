@@ -14,6 +14,9 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -64,6 +67,8 @@ public class GUI implements ActionListener{
 	boolean incOn;
 	boolean gameRunning;
 	
+	int storeItemCount = 15;
+	
 	private JTextArea textArea;
 	
 	   JMenuBar mb;
@@ -74,6 +79,7 @@ public class GUI implements ActionListener{
 
 	BuyListener buyListener;   
     int time = 1;
+    
     
     public GUI(String userName, MainMenu parent) {
     	user = new Player(userName, this);
@@ -91,6 +97,7 @@ public class GUI implements ActionListener{
     private void initGUI(Player user, boolean newGame) {
     	manager = parent.manager;
     	
+    	
     	gameRunning = true;
     	mainFrame = new JFrame();
     	//mainFrame.setSize(1000,1000);
@@ -99,112 +106,10 @@ public class GUI implements ActionListener{
     	titlePanel = new JPanel();
     	label = new JLabel();
     	incOn = false;
-    	this.objectStore = new JLabel[36];
+    	this.objectStore = new JLabel[15];
+    	panel = new JPanel(new GridLayout(3,5,10,10));
+    	setStore();
     	
-    	panel.removeAll();
-    	
-    	initMenuBar();
-    	
-    	
-    	panel = new JPanel(new GridLayout(6,7,10,10));
-    	
-    	for (Objects obj : user.objectIndex) {
-    		
-    		JPanel groupPanel = new JPanel();
-    		Dimension dim = groupPanel.getPreferredSize();
-    		dim.height = 150;
-    		dim.width = 250;
-    		groupPanel.setPreferredSize(dim);
-    		
-    		Color color;
-
-    		switch(obj.getRarity()) {
-    		case vintage:
-    			color = new Color(255,200,51);
-    			break;
-    		case rare:
-    			color = new Color(51,129,255);
-    			break;
-    		case unique:
-    			color = new Color(51,255,75);
-    			break;
-    		case legendary:
-    			color = new Color(51, 220,255);
-    			break;
-    		default:
-    			color = new Color(0,0,0);
-    			break;
-    		}
-    		
-    		
-    		Border coloredBorder = BorderFactory.createLineBorder(color,3);
-    		
-    		Border innerBorder = BorderFactory.createTitledBorder(coloredBorder, obj.getName());
-    		
-    		Border outerBorder = BorderFactory.createEmptyBorder(5,5,5,5);
-    		groupPanel.setBorder(BorderFactory.createCompoundBorder(outerBorder, innerBorder));
-    		groupPanel.setLayout(new GridBagLayout());
-    		GridBagConstraints gc = new GridBagConstraints();
-    		
-    		//////// 1
-    		gc.gridx = 0;
-    		gc.gridy = 0;
-    		gc.gridheight = 4;
-    		JLabel image = manager.getLabel(obj.name);
-    		image.setToolTipText(obj.getStats());
-    		groupPanel.add(image, gc);
-    		
-    		//////// 2
-    		gc.gridx = 1;
-    		gc.gridy = 1;
-    		gc.gridheight = 1;
-    		JLabel price = new JLabel("Price : " + obj.getLePrice() + "$");
-    		groupPanel.add(price,gc);
-    		
-    		//////// 3
-    		gc.gridx = 1;
-    		gc.gridy++;
-    		JLabel condTag = new JLabel("Condition : ");
-    		groupPanel.add(condTag, gc);
-    		
-    		//////// 4
-    		gc.gridy++;
-    		JLabel cond = new JLabel(obj.getLeCondition());
-    		groupPanel.add(cond,gc);
-    		
-    		//////// 5 
-    		gc.gridy++;
-    		JLabel inc = new JLabel("Pay : " + obj.getLeInc() + "$");
-    		groupPanel.add(inc,gc);
-    		
-    		//////// 6 
-    		gc.gridy++;
-    		JButton buy = new JButton("Buy");
-    		buy.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					String name = obj.getName();
-					int price = obj.getPrice();
-					int increment = obj.getInc();
-					int index = obj.getId();
-					
-					@SuppressWarnings("unused")
-					BuyEvent ev = new BuyEvent(this, name, increment, price, index);
-					
-					addEntry(user.buyObject(index));
-					yourStore.updateStorePanel();
-					
-					
-				}
-    			
-    		});
-    		
-    		groupPanel.add(buy, gc);
-    		panel.add(groupPanel);
-    	}
-    	
-    	user.setBuyListener(buyListener);
     	mainPanel = new JPanel();
     	mainPanel.setLayout(new GridBagLayout());
     	GridBagConstraints gc = new GridBagConstraints();
@@ -298,7 +203,7 @@ public class GUI implements ActionListener{
 		this.yourStore.setBorder(BorderFactory.createCompoundBorder(outerBorder, innerBorder));
 		
     	mainPanel.add(yourStore,gc);
-    	
+    	initMenuBar();
     	mainFrame.add(mainPanel);
     	mainFrame.pack();
     	System.out.println(yourStore.getWidth());
@@ -314,6 +219,144 @@ public class GUI implements ActionListener{
     	panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
     	
     	    }
+    
+    private void setStore() {
+    	
+    	panel.removeAll();
+    	
+    	
+    	
+    	
+    	
+    	for (int i: getRandomOrder(15)) {
+    		Objects obj = user.objectIndex[i];
+    		JPanel groupPanel = new JPanel();
+    		Dimension dim = groupPanel.getPreferredSize();
+    		dim.height = 150;
+    		dim.width = 240;
+    		groupPanel.setPreferredSize(dim);
+    		
+    		Color color;
+    		boolean bid = false;
+    		switch(obj.getRarity()) {
+    		case vintage:
+    			color = new Color(255,200,51);
+    			break;
+    		case rare:
+    			color = new Color(51,129,255);
+    			bid = true;
+    			break;
+    		case unique:
+    			color = new Color(51,255,75);
+    			bid = true;
+    			break;
+    		case legendary:
+    			color = new Color(51, 220,255);
+    			bid = true;
+    			break;
+    		default:
+    			color = new Color(0,0,0);
+    			break;
+    		}
+    		
+    		
+    		Border coloredBorder = BorderFactory.createLineBorder(color,3);
+    		
+    		Border innerBorder = BorderFactory.createTitledBorder(coloredBorder, obj.getName());
+    		
+    		Border outerBorder = BorderFactory.createEmptyBorder(5,5,5,5);
+    		groupPanel.setBorder(BorderFactory.createCompoundBorder(outerBorder, innerBorder));
+    		groupPanel.setLayout(new GridBagLayout());
+    		GridBagConstraints gc = new GridBagConstraints();
+    		
+    		//////// 1
+    		gc.gridx = 0;
+    		gc.gridy = 0;
+    		gc.gridheight = 4;
+    		gc.ipadx = 5;
+    		JLabel image = manager.getLabel(obj.name);
+    		image.setToolTipText(obj.getStats());
+    		groupPanel.add(image, gc);
+    		
+    		//////// 2
+    		gc.ipady = 0;
+    		gc.gridx = 1;
+    		gc.gridy = 1;
+    		gc.gridheight = 1;
+    		JLabel price = new JLabel("Price : " + obj.getLePrice() + "$");
+    		groupPanel.add(price,gc);
+    		
+    		//////// 3
+    		gc.gridx = 1;
+    		gc.gridy++;
+    		JLabel condTag = new JLabel("Condition : ");
+    		groupPanel.add(condTag, gc);
+    		
+    		//////// 4
+    		gc.gridy++;
+    		JLabel cond = new JLabel(obj.getLeCondition());
+    		groupPanel.add(cond,gc);
+    		
+    		//////// 5 
+    		gc.gridy++;
+    		JLabel inc = new JLabel("Pay : " + obj.getLeInc() + "$");
+    		groupPanel.add(inc,gc);
+    		
+    		if(bid) {
+    			//////// 6 
+        		gc.gridx++;
+        		JButton auction = new JButton("Bid");
+        		
+        		groupPanel.add(auction,gc);
+    		}
+    	
+    		
+    		//////// 7 
+    		gc.gridy++;
+    		JButton buy = new JButton("Buy");
+    		buy.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String name = obj.getName();
+					int price = obj.getPrice();
+					int increment = obj.getInc();
+					int index = obj.getId();
+					
+					@SuppressWarnings("unused")
+					BuyEvent ev = new BuyEvent(this, name, increment, price, index);
+					
+					addEntry(user.buyObject(index));
+					yourStore.updateStorePanel();
+					
+					
+				}
+    			
+    		});
+    		
+    		groupPanel.add(buy, gc);
+    		panel.add(groupPanel);
+    	}
+    	
+    	user.setBuyListener(buyListener);
+		panel.revalidate();
+		panel.repaint();
+    }
+    
+	private List<Integer> getRandomOrder(int size) {
+		
+		List<Integer> list = new ArrayList<Integer>();
+		for (int i = 0; i < size;i++) {
+			list.add(i);
+		}
+		//System.out.println("avant shuffle: ");
+		//for (int elem:list) System.out.println(elem);
+		Collections.shuffle(list);
+		//System.out.println("après shuffle: ");
+		//for (int elem:list) System.out.println(elem);
+		
+		return list;
+	}
     
     public void actionPerformed(ActionEvent e) {
     	
@@ -408,10 +451,12 @@ public class GUI implements ActionListener{
 				if(i == 9) {
 					incrementer();
 					i = 0;
-					if(clock > 99) {
+					if(clock > 9) {
 						clock = 0;
 						user.gainValue();
 						yourStore.updateStorePanel();
+						this.panel.removeAll();
+						setStore();
 					}
 					clock++;
 				}
@@ -479,4 +524,6 @@ public class GUI implements ActionListener{
 	public void tick(int i) {
 		progressBar.setValue(i);
 	}
+	
+
 }}

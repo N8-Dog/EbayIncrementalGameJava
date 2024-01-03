@@ -139,7 +139,7 @@ public class Player {
 	}
 	
 	public String sellItem(int index) {
-		int price = myStore[index].getPrice();
+		int price = myStore[index].getValue();
 		money += price;
 		inc -= myStore[index].getInc();
 		myStore[index] = null;
